@@ -1,11 +1,17 @@
 "use client";
 
-import React from "react";
+import { supabaseBrowser } from "@/lib/supabase/browser";
 import { Input } from "./ui/input";
+import { toast } from "sonner";
 
 export default function ChatInput() {
-  const handleSendMessage = (text: string) => {
-    console.log(text);
+  const supabase = supabaseBrowser();
+  const handleSendMessage = async (text: string) => {
+    const { error } = await supabase.from("messages").insert({ text });
+
+    if (error) {
+      toast.error("Failed to send message");
+    }
   };
 
   return (
