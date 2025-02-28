@@ -11,6 +11,7 @@ export default function ChatInput() {
   const user = useUser(state => state.user);
 
   const addMessage = useMessage(state => state.addMessage);
+  const setOptimisticIds = useMessage(state => state.setOptimisticIds);
 
   const supabase = supabaseBrowser();
 
@@ -18,8 +19,9 @@ export default function ChatInput() {
     const trimmedText = text.trim();
     if (trimmedText === "") return;
 
+    const id = uuid();
     const newMessage = {
-      id: uuid(),
+      id,
       text: trimmedText,
       send_by: user?.id,
       is_edit: false,
@@ -33,10 +35,11 @@ export default function ChatInput() {
     };
 
     addMessage(newMessage as Imessage);
+    setOptimisticIds(newMessage.id);
 
     const { error } = await supabase
       .from("messages")
-      .insert({ text: trimmedText });
+      .insert({ text: trimmedText, id });
 
     if (error) {
       toast.error("Failed to send message");
