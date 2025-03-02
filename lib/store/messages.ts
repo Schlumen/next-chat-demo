@@ -43,7 +43,7 @@ export const useMessage = create<MessageState>()(set => ({
   optimisticUpdateMessage: newMessage =>
     set(state => ({
       messages: state.messages.map(message =>
-        message.id === newMessage.id ? newMessage : message
+        message.id === newMessage.id ? { ...message, ...newMessage } : message
       ),
     })),
 }));

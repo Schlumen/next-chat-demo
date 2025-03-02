@@ -10,7 +10,13 @@ import { toast } from "sonner";
 export default function ListMessages() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [hasLoaded, setHasLoaded] = useState(false);
-  const { messages, addMessage, optimisticIds } = useMessage(state => state);
+  const {
+    messages,
+    addMessage,
+    optimisticIds,
+    optimisticDeleteMessage,
+    optimisticUpdateMessage,
+  } = useMessage(state => state);
   const supabase = supabaseBrowser();
 
   useEffect(() => {
@@ -40,12 +46,33 @@ export default function ListMessages() {
           }
         }
       )
+      .on(
+        "postgres_changes",
+        { event: "DELETE", schema: "public", table: "messages" },
+        payload => {
+          optimisticDeleteMessage(payload.old.id);
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "messages" },
+        payload => {
+          optimisticUpdateMessage(payload.new as Imessage);
+        }
+      )
       .subscribe();
 
     return () => {
       channel.unsubscribe();
     };
-  }, [addMessage, supabase, messages, optimisticIds]);
+  }, [
+    addMessage,
+    supabase,
+    messages,
+    optimisticIds,
+    optimisticDeleteMessage,
+    optimisticUpdateMessage,
+  ]);
 
   useEffect(() => {
     const scrollContainer = scrollRef.current;
