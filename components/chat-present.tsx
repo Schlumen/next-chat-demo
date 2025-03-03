@@ -20,7 +20,7 @@ export default function ChatPresent() {
           userIds.push(channel.presenceState()[id][0].user_id);
         }
 
-        setOnlineUsers([...new Set(userIds)].length);
+        setOnlineUsers([...new Set(userIds)].filter(id => !!id).length);
       })
       .subscribe(async status => {
         if (status === "SUBSCRIBED") {
