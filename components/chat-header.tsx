@@ -5,6 +5,7 @@ import { Button } from "./ui/button";
 import { User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 import ChatPresent from "./chat-present";
+import { useUser } from "@/lib/store/user";
 
 export default function ChatHeader({ user }: { user: User | null }) {
   const router = useRouter();
@@ -22,6 +23,7 @@ export default function ChatHeader({ user }: { user: User | null }) {
   const handleLogout = async () => {
     const supabase = supabaseBrowser();
     await supabase.auth.signOut();
+    useUser.setState({ user: null });
     router.refresh();
   };
 
